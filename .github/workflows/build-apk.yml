@@ -6,6 +6,9 @@ on:
       - "v*"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,12 +33,31 @@ jobs:
           KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
         run: |
-          if [ -z "$KEYSTORE_B64" ]; then
-            echo "No RELEASE_KEYSTORE_BASE64 secret set; release APK will be unsigned."
+          set -euo pipefail
+          set_count=0
+          for v in KEYSTORE_B64 KEYSTORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            [ -n "${!v}" ] && set_count=$((set_count + 1))
+          done
+          if [ "$set_count" -eq 0 ]; then
+            echo "No release signing secrets set; release APK will be unsigned."
             exit 0
           fi
+          if [ "$set_count" -ne 4 ]; then
+            echo "::error::Partial release signing config. Set all four secrets:"
+            echo "  RELEASE_KEYSTORE_BASE64  ($([ -n "$KEYSTORE_B64" ] && echo set || echo MISSING))"
+            echo "  RELEASE_KEYSTORE_PASSWORD ($([ -n "$KEYSTORE_PASSWORD" ] && echo set || echo MISSING))"
+            echo "  RELEASE_KEY_ALIAS         ($([ -n "$KEY_ALIAS" ] && echo set || echo MISSING))"
+            echo "  RELEASE_KEY_PASSWORD      ($([ -n "$KEY_PASSWORD" ] && echo set || echo MISSING))"
+            exit 1
+          fi
           mkdir -p keystore
-          printf '%s' "$KEYSTORE_B64" | base64 -d > keystore/release.jks
+          # Strip whitespace from the base64 payload so newline-wrapped
+          # output from `base64 -i` on macOS still decodes cleanly.
+          printf '%s' "$KEYSTORE_B64" | tr -d '[:space:]' | base64 -d > keystore/release.jks
+          if [ ! -s keystore/release.jks ]; then
+            echo "::error::Decoded keystore is empty — RELEASE_KEYSTORE_BASE64 is not valid base64."
+            exit 1
+          fi
           {
             echo "releaseStoreFile=keystore/release.jks"
             echo "releaseStorePassword=$KEYSTORE_PASSWORD"
@@ -57,3 +79,10 @@ jobs:
           name: btclock-widget-release-${{ github.ref_name }}
           path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
+
+      - name: Create GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v3
+        with:
+          files: app/build/outputs/apk/release/app-release.apk
+          generate_release_notes: true
