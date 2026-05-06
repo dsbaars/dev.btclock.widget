@@ -1,9 +1,20 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
 }
+
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+val releaseStoreFile: String? = localProps.getProperty("releaseStoreFile")
+val releaseStorePassword: String? = localProps.getProperty("releaseStorePassword")
+val releaseKeyAlias: String? = localProps.getProperty("releaseKeyAlias")
+val releaseKeyPassword: String? = localProps.getProperty("releaseKeyPassword")
 
 android {
     namespace = "dev.btclock.widget"
@@ -17,10 +28,22 @@ android {
         versionName = "0.1.0"
     }
 
+    signingConfigs {
+        if (releaseStoreFile != null && releaseStorePassword != null && releaseKeyAlias != null && releaseKeyPassword != null) {
+            create("release") {
+                storeFile = rootProject.file(releaseStoreFile)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfigs.findByName("release")?.let { signingConfig = it }
         }
         debug {
             isMinifyEnabled = false
