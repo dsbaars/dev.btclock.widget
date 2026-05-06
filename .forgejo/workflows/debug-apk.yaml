@@ -25,7 +25,7 @@ jobs:
           ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
           CMDLINE_TOOLS_VERSION: "11076708"
         run: |
-          set -euo pipefail
+          set -euxo pipefail
           apt-get update
           apt-get install -y --no-install-recommends curl unzip
           mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
@@ -35,7 +35,30 @@ jobs:
           unzip -q tools.zip
           mv cmdline-tools latest
           rm tools.zip
-          yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
+          # Heredoc avoids SIGPIPE that `yes |` triggers under pipefail
+          # when sdkmanager closes stdin after accepting all licenses.
+          "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null <<EOF
+          y
+          y
+          y
+          y
+          y
+          y
+          y
+          y
+          y
+          y
+          y
+          y
+          y
+          y
+          y
+          y
+          y
+          y
+          y
+          y
+          EOF
           "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" \
             "platform-tools" "platforms;android-35" "build-tools;35.0.0"
           echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> "$GITHUB_ENV"
