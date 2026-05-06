@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Adaptive-icon foreground: three light-grey BTClock display panels
+  with the gold ENIG silkscreen border. Mirrors the dashboard
+  favicon (web/static/favicon.svg) — exact same fills, stroke colour,
+  and proportions, just remapped from the SVG's 32×32 viewport to the
+  108dp foreground viewport with the geometry placed inside the
+  72dp adaptive-icon safe zone (centre 18..90 on each axis).
+
+  Path data uses arc commands (A) to express the rx=2.7 corner radius
+  on each panel — Android VectorDrawable doesn't support <rect> with
+  rx like SVG does, so each rounded rectangle is a 4-arc path.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Panel 1 (left): x=27..40.5, y=36..72, rx=2.7 -->
+    <path
+        android:fillColor="#DADBDE"
+        android:strokeColor="#F1C64A"
+        android:strokeWidth="2.25"
+        android:pathData="M29.7,36 H37.8 A2.7,2.7 0 0 1 40.5,38.7 V69.3 A2.7,2.7 0 0 1 37.8,72 H29.7 A2.7,2.7 0 0 1 27,69.3 V38.7 A2.7,2.7 0 0 1 29.7,36 Z" />
+
+    <!-- Panel 2 (centre): x=47.25..60.75 -->
+    <path
+        android:fillColor="#DADBDE"
+        android:strokeColor="#F1C64A"
+        android:strokeWidth="2.25"
+        android:pathData="M49.95,36 H58.05 A2.7,2.7 0 0 1 60.75,38.7 V69.3 A2.7,2.7 0 0 1 58.05,72 H49.95 A2.7,2.7 0 0 1 47.25,69.3 V38.7 A2.7,2.7 0 0 1 49.95,36 Z" />
+
+    <!-- Panel 3 (right): x=67.5..81 -->
+    <path
+        android:fillColor="#DADBDE"
+        android:strokeColor="#F1C64A"
+        android:strokeWidth="2.25"
+        android:pathData="M70.2,36 H78.3 A2.7,2.7 0 0 1 81,38.7 V69.3 A2.7,2.7 0 0 1 78.3,72 H70.2 A2.7,2.7 0 0 1 67.5,69.3 V38.7 A2.7,2.7 0 0 1 70.2,36 Z" />
+</vector>

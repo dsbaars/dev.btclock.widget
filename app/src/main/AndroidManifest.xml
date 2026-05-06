@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- INTERNET is required for the periodic backend fetch. The widget
+         talks to a user-configured ws-node host (see SettingsActivity). -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:theme="@style/Theme.BTClock"
+        android:allowBackup="true"
+        android:supportsRtl="true">
+
+        <!-- Glance widget receiver. Picks up AppWidgetProvider broadcasts
+             and forwards them to BTClockWidget.provideGlance(). -->
+        <receiver
+            android:name=".BTClockWidgetReceiver"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/widget_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/btclock_widget_info" />
+        </receiver>
+
+        <!-- Auto-rotation tick. AlarmManager fires this directly so the
+             screen-cycle cadence works at sub-15-min intervals
+             (WorkManager's periodic floor). Receiver scope is private
+             to the app — only AlarmManager dispatches to it. -->
+        <receiver
+            android:name=".RotationTickReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="dev.btclock.widget.ROTATE_TICK" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Optional configuration UI launched both from the widget tap
+             and from the launcher. Lets the user point the widget at
+             a ws-node host and pick a default screen. -->
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="true"
+            android:label="@string/settings_label"
+            android:theme="@style/Theme.BTClock">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

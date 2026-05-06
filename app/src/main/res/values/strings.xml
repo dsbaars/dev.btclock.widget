@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BTClock Widget</string>
+    <string name="widget_label">BTClock</string>
+    <string name="widget_description">Live Bitcoin block height, price, and fee rendered in BTClock\'s display style.</string>
+    <string name="widget_loading">Connecting…</string>
+    <string name="settings_label">BTClock Widget Settings</string>
+    <string name="backend_label">Backend (ws-node) URL</string>
+    <string name="backend_hint">https://your-node.example:8080</string>
+    <string name="screen_label">Default screen</string>
+    <string name="save">Save</string>
+    <string name="screen_block_height">Block height</string>
+    <string name="screen_price">BTC price</string>
+    <string name="screen_moscow_time">Sats per fiat (Moscow time)</string>
+    <string name="screen_fee_rate">Fee rate</string>
+    <string name="screen_halving">Halving countdown</string>
+    <string name="screen_market_cap">Market cap</string>
+    <string name="screen_supply">Bitcoin supply</string>
+    <string name="currency_label">Price currency</string>
+    <string name="rotation_label">Auto-rotate screens</string>
+    <string name="rotation_hint">Cycle through the screens below at the configured cadence. Set to 0 to disable rotation and pin the manual screen above.</string>
+    <string name="rotation_minutes_label">Interval (minutes)</string>
+    <string name="rotation_screens_label">Include in rotation</string>
+    <string name="font_label">Digit font</string>
+    <string name="font_antonio">Antonio</string>
+    <string name="font_oswald">Oswald</string>
+</resources>

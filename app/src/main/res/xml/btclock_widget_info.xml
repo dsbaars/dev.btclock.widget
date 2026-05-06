@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Widget metadata. The BTClock device is 219.6 × 81.25 mm — a ~2.7:1
+  landscape rectangle. Most launchers go by minHeight + targetCellHeight
+  to pick a row count; we keep both small so the widget lands as a
+  short, wide row instead of a square. The exact ratio is enforced by
+  the renderer via LocalSize, but Android cells are coarser than that
+  so giving the launcher hints to "prefer wide" matters.
+
+    minWidth/Height        — first-time pick (legacy launchers use these
+                             directly; modern launchers fall back to them
+                             when targetCell* is missing)
+    targetCellWidth/Height — Pixel Launcher and Material You launchers
+                             use this on Android 12+; 5×1 is the
+                             closest cell match to the BTClock aspect
+                             on a typical 5-column / 5-row home grid.
+    minResize*             — caps the resize-handle range so users can't
+                             collapse it into a square cell.
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="320dp"
+    android:minHeight="60dp"
+    android:targetCellWidth="5"
+    android:targetCellHeight="1"
+    android:minResizeWidth="240dp"
+    android:minResizeHeight="50dp"
+    android:maxResizeWidth="640dp"
+    android:maxResizeHeight="200dp"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen"
+    android:initialLayout="@layout/widget_initial_loading"
+    android:updatePeriodMillis="0"
+    android:configure="dev.btclock.widget.SettingsActivity"
+    android:previewLayout="@layout/widget_initial_loading"
+    android:description="@string/widget_description" />
