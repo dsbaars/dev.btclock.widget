@@ -12,6 +12,12 @@ Talks to a [BTClock ws-node](https://git.btclock.dev/btclock/ws-nostr-publish-go
 defaulting to the public instance at `https://ws.btclock.dev` so the
 widget works out-of-the-box without running anything yourself.
 
+## Screenshots
+
+| Home-screen widget | Settings activity |
+|---|---|
+| <img src="screenshot.png" alt="BTClock widget on Android home screen" width="320" /> | <img src="screenshot-settings.png" alt="BTClock widget settings activity" width="320" /> |
+
 ## Features
 
 - Seven on-device screens, modelled on the firmware's doc renders:
