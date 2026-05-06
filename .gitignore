@@ -18,3 +18,8 @@ captures/
 # Keystore
 *.jks
 *.keystore
+
+# Environment
+.env
+.env.*
+!.env.example
