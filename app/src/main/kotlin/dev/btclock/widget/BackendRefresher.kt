@@ -53,16 +53,21 @@ object BackendRefresher {
             updateAppWidgetState(context, PreferencesGlanceStateDefinition, id) { prefs ->
                 prefs.toMutablePreferences().apply {
                     snapshot.blockHeight?.let { set(WidgetStateKeys.BlockHeight, it) }
+                    val newCcy = snapshot.currency
+                    val storedCcy = this[WidgetStateKeys.PriceCurrency]
                     if (snapshot.price != null) {
                         set(WidgetStateKeys.PriceCents, (snapshot.price * 100).toLong())
-                        set(WidgetStateKeys.PriceCurrency, snapshot.currency)
-                    } else {
-                        // The chosen currency isn't on the upstream
-                        // node — clear the stale price so we don't
-                        // show a previous currency's value under a
-                        // new symbol.
+                        set(WidgetStateKeys.PriceCurrency, newCcy)
+                    } else if (storedCcy != null && storedCcy != newCcy) {
+                        // User switched to a currency the upstream node
+                        // doesn't expose — clear the stale value so we
+                        // don't render it under the new symbol.
+                        // Transient fetch errors with the same currency
+                        // fall through and leave the previous good
+                        // price in place, matching the class-level
+                        // contract for blockHeight and medianFee.
                         remove(WidgetStateKeys.PriceCents)
-                        set(WidgetStateKeys.PriceCurrency, snapshot.currency)
+                        set(WidgetStateKeys.PriceCurrency, newCcy)
                     }
                     snapshot.medianFee?.let { set(WidgetStateKeys.MedianFeeMilli, (it * 1000).toLong()) }
                     set(WidgetStateKeys.LastFetchEpochMs, System.currentTimeMillis())
