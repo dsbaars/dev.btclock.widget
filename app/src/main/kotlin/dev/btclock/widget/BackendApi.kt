@@ -11,7 +11,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.jsonPrimitive
 
 /**
  * Tiny REST client for the ws-node's snapshot endpoints. We hit the
@@ -42,17 +41,23 @@ data class BackendSnapshot(
     val medianFee: Double?,
 )
 
-class BackendApi(private val baseUrl: String) {
-
-    private val json = Json { ignoreUnknownKeys = true; isLenient = true }
-    private val client = HttpClient(OkHttp) {
-        install(ContentNegotiation) { json(this@BackendApi.json) }
-        install(HttpTimeout) {
-            connectTimeoutMillis = 8_000
-            requestTimeoutMillis = 12_000
-            socketTimeoutMillis = 12_000
+class BackendApi(
+    private val baseUrl: String,
+) {
+    private val json =
+        Json {
+            ignoreUnknownKeys = true
+            isLenient = true
         }
-    }
+    private val client =
+        HttpClient(OkHttp) {
+            install(ContentNegotiation) { json(this@BackendApi.json) }
+            install(HttpTimeout) {
+                connectTimeoutMillis = 8_000
+                requestTimeoutMillis = 12_000
+                socketTimeoutMillis = 12_000
+            }
+        }
 
     /**
      * Fetch all three snapshot values, picking [currency] out of the
@@ -90,8 +95,9 @@ class BackendApi(private val baseUrl: String) {
      * widget over a JSON-type tweak.
      */
     private fun parsePriceMap(body: String): Map<String, Double> {
-        val element: JsonElement = runCatching { json.parseToJsonElement(body) }.getOrNull()
-            ?: return emptyMap()
+        val element: JsonElement =
+            runCatching { json.parseToJsonElement(body) }.getOrNull()
+                ?: return emptyMap()
         if (element !is JsonObject) return emptyMap()
         val out = HashMap<String, Double>(element.size)
         for ((k, v) in element) {

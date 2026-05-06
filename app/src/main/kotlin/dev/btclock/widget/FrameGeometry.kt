@@ -40,7 +40,10 @@ object FrameGeometry {
     fun panelGutterMm(n: Int): Double =
         (FRAME_W_MM - 2 * SIDE_MARGIN_MM - n * PANEL_W_MM) / (n - 1)
 
-    data class PanelOriginMm(val xMm: Double, val yMm: Double)
+    data class PanelOriginMm(
+        val xMm: Double,
+        val yMm: Double,
+    )
 
     fun panelOriginMm(i: Int, n: Int): PanelOriginMm {
         val gutter = panelGutterMm(n)
@@ -52,7 +55,11 @@ object FrameGeometry {
 }
 
 /** Two-tone palette for normal and inverted (white-on-black) panels. */
-data class PanelPalette(val pcb: Int, val panelBg: Int, val panelInk: Int) {
+data class PanelPalette(
+    val pcb: Int,
+    val panelBg: Int,
+    val panelInk: Int,
+) {
     companion object {
         // ARGB ints, big-endian as Android Color expects.
         private const val PCB = 0xFF0A0A0A.toInt()

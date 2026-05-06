@@ -72,6 +72,12 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', 'gradle/libs.versions.toml') }}
           restore-keys: ${{ runner.os }}-gradle-
 
+      - name: Lint (ktlint + Android Lint)
+        run: ./gradlew ktlintCheck
+
+      - name: Unit tests
+        run: ./gradlew :app:testDebugUnitTest
+
       - name: Build debug APK
         run: ./gradlew :app:assembleDebug
 

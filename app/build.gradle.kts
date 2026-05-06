@@ -7,10 +7,11 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-val localProps = Properties().apply {
-    val f = rootProject.file("local.properties")
-    if (f.exists()) f.inputStream().use { load(it) }
-}
+val localProps =
+    Properties().apply {
+        val f = rootProject.file("local.properties")
+        if (f.exists()) f.inputStream().use { load(it) }
+    }
 val releaseStoreFile: String? = localProps.getProperty("releaseStoreFile")
 val releaseStorePassword: String? = localProps.getProperty("releaseStorePassword")
 val releaseKeyAlias: String? = localProps.getProperty("releaseKeyAlias")
@@ -63,6 +64,9 @@ android {
         getByName("main") {
             kotlin.srcDirs("src/main/kotlin")
         }
+        getByName("test") {
+            kotlin.srcDirs("src/test/kotlin")
+        }
     }
 
     buildFeatures {
@@ -100,4 +104,6 @@ dependencies {
 
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
+
+    testImplementation(libs.junit)
 }

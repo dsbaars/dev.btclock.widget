@@ -25,7 +25,6 @@ import kotlinx.coroutines.launch
  * cold-start; the alarm fires it directly without the app being open.
  */
 class RotationTickReceiver : BroadcastReceiver() {
-
     /**
      * goAsync() lets a BroadcastReceiver keep its process alive past
      * onReceive() return so the Glance state write + redraw can

@@ -2,8 +2,8 @@ package dev.btclock.widget
 
 import android.content.Context
 import androidx.glance.appwidget.GlanceAppWidgetManager
-import androidx.work.CoroutineWorker
 import androidx.work.Constraints
+import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
@@ -23,8 +23,10 @@ import java.util.concurrent.TimeUnit
  * second-level live data should run the dashboard on a tablet next to
  * the device.
  */
-class RefreshWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(appContext, params) {
-
+class RefreshWorker(
+    appContext: Context,
+    params: WorkerParameters,
+) : CoroutineWorker(appContext, params) {
     override suspend fun doWork(): Result {
         // Delegate the fetch + state-write to the shared refresher so
         // the periodic Worker, the rotation tick receiver, and the
@@ -48,13 +50,16 @@ class RefreshWorker(appContext: Context, params: WorkerParameters) : CoroutineWo
          * available window rather than burning a slot.
          */
         fun schedule(context: Context) {
-            val constraints = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build()
+            val constraints =
+                Constraints
+                    .Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
 
-            val request = PeriodicWorkRequestBuilder<RefreshWorker>(15, TimeUnit.MINUTES)
-                .setConstraints(constraints)
-                .build()
+            val request =
+                PeriodicWorkRequestBuilder<RefreshWorker>(15, TimeUnit.MINUTES)
+                    .setConstraints(constraints)
+                    .build()
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 UNIQUE_NAME,
@@ -65,11 +70,12 @@ class RefreshWorker(appContext: Context, params: WorkerParameters) : CoroutineWo
 
         /** One-shot refresh for the "just added" / "settings just saved" path. */
         fun runOnce(context: Context) {
-            val request = androidx.work.OneTimeWorkRequestBuilder<RefreshWorker>()
-                .setConstraints(
-                    Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
-                )
-                .build()
+            val request =
+                androidx.work
+                    .OneTimeWorkRequestBuilder<RefreshWorker>()
+                    .setConstraints(
+                        Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build(),
+                    ).build()
             WorkManager.getInstance(context).enqueue(request)
         }
     }

@@ -28,7 +28,6 @@ import android.os.Build
  * The actual screen advance + redraw lives in [RotationTickReceiver].
  */
 object RotationScheduler {
-
     /** Action ID matched by [RotationTickReceiver]. */
     const val ACTION = "dev.btclock.widget.ROTATE_TICK"
 
@@ -75,11 +74,12 @@ object RotationScheduler {
     ): PendingIntent? {
         val intent = Intent(ACTION).setPackage(context.packageName)
         var flags = if (createIfMissing) PendingIntent.FLAG_UPDATE_CURRENT else PendingIntent.FLAG_NO_CREATE
-        flags = flags or if (mutable) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0
-        } else {
-            PendingIntent.FLAG_IMMUTABLE
-        }
+        flags = flags or
+            if (mutable) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0
+            } else {
+                PendingIntent.FLAG_IMMUTABLE
+            }
         return PendingIntent.getBroadcast(context, REQ_CODE, intent, flags)
     }
 }

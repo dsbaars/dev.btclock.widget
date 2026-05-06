@@ -42,7 +42,6 @@ class FrameRenderer(
     private val inverted: Boolean = false,
     private val digitFont: DigitFont = DigitFont.Antonio,
 ) {
-
     private val palette = PanelPalette.forInverted(inverted)
 
     private fun loadFont(name: String, fallbackStyle: Int): Typeface {
@@ -63,53 +62,62 @@ class FrameRenderer(
     private val labelTypeface: Typeface by lazy { loadFont("oswald_bold", Typeface.BOLD) }
     private val satTypeface: Typeface by lazy { loadFont("satoshi_symbol", Typeface.NORMAL) }
 
-    private val pcbPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = palette.pcb
-        style = Paint.Style.FILL
-    }
+    private val pcbPaint =
+        Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = palette.pcb
+            style = Paint.Style.FILL
+        }
 
-    private val panelFillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = palette.panelBg
-        style = Paint.Style.FILL
-    }
+    private val panelFillPaint =
+        Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = palette.panelBg
+            style = Paint.Style.FILL
+        }
 
-    private val ringPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STROKE
-        strokeJoin = Paint.Join.ROUND
-        strokeCap = Paint.Cap.ROUND
-    }
+    private val ringPaint =
+        Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.STROKE
+            strokeJoin = Paint.Join.ROUND
+            strokeCap = Paint.Cap.ROUND
+        }
 
-    private val screwPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0xFFDADBDE.toInt()
-        style = Paint.Style.FILL
-    }
+    private val screwPaint =
+        Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = 0xFFDADBDE.toInt()
+            style = Paint.Style.FILL
+        }
 
-    private val wordmarkPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.FILL
-    }
+    private val wordmarkPaint =
+        Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.FILL
+        }
 
-    private val digitPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = palette.panelInk
-        textAlign = Paint.Align.CENTER
-        typeface = digitTypeface
-    }
+    private val digitPaint =
+        Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = palette.panelInk
+            textAlign = Paint.Align.CENTER
+            typeface = digitTypeface
+        }
 
-    private val labelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = palette.panelInk
-        textAlign = Paint.Align.CENTER
-        typeface = labelTypeface
-    }
+    private val labelPaint =
+        Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = palette.panelInk
+            textAlign = Paint.Align.CENTER
+            typeface = labelTypeface
+        }
 
-    private val satPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = palette.panelInk
-        textAlign = Paint.Align.CENTER
-        typeface = satTypeface
-    }
+    private val satPaint =
+        Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = palette.panelInk
+            textAlign = Paint.Align.CENTER
+            typeface = satTypeface
+        }
 
-    private val separatorPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = palette.panelInk
-        style = Paint.Style.FILL
-    }
+    private val separatorPaint =
+        Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = palette.panelInk
+            style = Paint.Style.FILL
+        }
 
     private val tmpBounds = Rect()
 
@@ -156,11 +164,16 @@ class FrameRenderer(
     }
 
     private fun drawPanels(canvas: Canvas, pxPerMm: Double, cells: List<PanelText>) {
-        val gold = LinearGradient(
-            0f, 0f, 0f, (FrameGeometry.PANEL_H_MM * pxPerMm).toFloat(),
-            PanelPalette.GOLD_BRIGHT, PanelPalette.GOLD_DEEP,
-            Shader.TileMode.CLAMP,
-        )
+        val gold =
+            LinearGradient(
+                0f,
+                0f,
+                0f,
+                (FrameGeometry.PANEL_H_MM * pxPerMm).toFloat(),
+                PanelPalette.GOLD_BRIGHT,
+                PanelPalette.GOLD_DEEP,
+                Shader.TileMode.CLAMP,
+            )
         ringPaint.shader = gold
 
         val ringW = (FrameGeometry.RING_W_MM * pxPerMm).toFloat()
@@ -191,22 +204,24 @@ class FrameRenderer(
             canvas.drawRoundRect(panelRect, panelR, panelR, panelFillPaint)
 
             val ringPx = (ringOffsetMm * pxPerMm).toFloat()
-            val ringRect = RectF(
-                panelRect.left - ringPx,
-                panelRect.top - ringPx,
-                panelRect.right + ringPx,
-                panelRect.bottom + ringPx,
-            )
+            val ringRect =
+                RectF(
+                    panelRect.left - ringPx,
+                    panelRect.top - ringPx,
+                    panelRect.right + ringPx,
+                    panelRect.bottom + ringPx,
+                )
             val ringR = ((FrameGeometry.PANEL_R_MM + ringOffsetMm) * pxPerMm).toFloat()
             canvas.drawRoundRect(ringRect, ringR, ringR, ringPaint)
 
             val bezelPx = (FrameGeometry.PANEL_BEZEL_MM * pxPerMm).toFloat()
-            val innerRect = RectF(
-                panelRect.left + bezelPx,
-                panelRect.top + bezelPx,
-                panelRect.right - bezelPx,
-                panelRect.bottom - bezelPx,
-            )
+            val innerRect =
+                RectF(
+                    panelRect.left + bezelPx,
+                    panelRect.top + bezelPx,
+                    panelRect.right - bezelPx,
+                    panelRect.bottom - bezelPx,
+                )
             drawPanelContent(canvas, innerRect, cells[i], sharedLabelSize)
         }
     }
@@ -399,11 +414,12 @@ class FrameRenderer(
         val visualCentre = (tmpBounds.top + tmpBounds.bottom) / 2f
         val visualHeight = (tmpBounds.bottom - tmpBounds.top).toFloat()
         val edgeGap = rect.height() * 0.06f
-        val centerY = if (biasTowardBottom) {
-            rect.bottom - edgeGap - visualHeight / 2f
-        } else {
-            rect.top + edgeGap + visualHeight / 2f
-        }
+        val centerY =
+            if (biasTowardBottom) {
+                rect.bottom - edgeGap - visualHeight / 2f
+            } else {
+                rect.top + edgeGap + visualHeight / 2f
+            }
         val baseline = centerY - visualCentre
         canvas.drawText(word, rect.centerX(), baseline, labelPaint)
     }
@@ -455,12 +471,16 @@ class FrameRenderer(
         m.postTranslate(xPx.toFloat(), baselinePx.toFloat())
         path.transform(m)
 
-        wordmarkPaint.shader = LinearGradient(
-            0f, baselinePx.toFloat() - (FrameGeometry.WORDMARK_FONT_SIZE_MM * pxPerMm).toFloat(),
-            0f, baselinePx.toFloat(),
-            PanelPalette.GOLD_BRIGHT, PanelPalette.GOLD_DEEP,
-            Shader.TileMode.CLAMP,
-        )
+        wordmarkPaint.shader =
+            LinearGradient(
+                0f,
+                baselinePx.toFloat() - (FrameGeometry.WORDMARK_FONT_SIZE_MM * pxPerMm).toFloat(),
+                0f,
+                baselinePx.toFloat(),
+                PanelPalette.GOLD_BRIGHT,
+                PanelPalette.GOLD_DEEP,
+                Shader.TileMode.CLAMP,
+            )
         canvas.drawPath(path, wordmarkPaint)
     }
 }

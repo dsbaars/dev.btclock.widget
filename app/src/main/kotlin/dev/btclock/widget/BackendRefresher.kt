@@ -30,7 +30,6 @@ import androidx.glance.state.PreferencesGlanceStateDefinition
  * mid-rotation; the next tick will retry.
  */
 object BackendRefresher {
-
     /**
      * Fetch the snapshot and write it to every pinned widget instance.
      * The optional [onlyId] parameter limits the write to a single
@@ -41,11 +40,12 @@ object BackendRefresher {
     suspend fun refreshNow(context: Context, onlyId: GlanceId? = null) {
         val cfg = Prefs.read(context)
         val api = BackendApi(cfg.backendUrl)
-        val snapshot = try {
-            api.fetchSnapshot(cfg.currency)
-        } finally {
-            api.close()
-        }
+        val snapshot =
+            try {
+                api.fetchSnapshot(cfg.currency)
+            } finally {
+                api.close()
+            }
 
         val manager = GlanceAppWidgetManager(context)
         val ids = if (onlyId != null) listOf(onlyId) else manager.getGlanceIds(BTClockWidget::class.java)

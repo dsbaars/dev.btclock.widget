@@ -40,7 +40,9 @@ object PrefKeys {
  * firmware's two most-used picks. Add a new entry here + the
  * corresponding res/font/<lowercase>.ttf to expose another face.
  */
-enum class DigitFont(val resourceName: String) {
+enum class DigitFont(
+    val resourceName: String,
+) {
     Antonio(resourceName = "antonio_regular"),
     Oswald(resourceName = "oswald_regular"),
 }
@@ -110,15 +112,16 @@ object Prefs {
         }
     }
 
-    private fun Preferences.toConfig() = WidgetConfig(
-        backendUrl = this[PrefKeys.BackendUrl]?.takeIf { it.isNotBlank() } ?: DEFAULT_URL,
-        screen = parseScreen(this[PrefKeys.Screen]),
-        inverted = this[PrefKeys.Inverted] == "true",
-        currency = this[PrefKeys.Currency]?.takeIf { it.isNotBlank() }?.uppercase() ?: DEFAULT_CURRENCY,
-        rotationMinutes = this[PrefKeys.RotationMinutes] ?: DEFAULT_ROTATION_MINUTES,
-        rotationScreens = parseScreens(this[PrefKeys.RotationScreens]),
-        digitFont = parseFont(this[PrefKeys.DigitFont]),
-    )
+    private fun Preferences.toConfig() =
+        WidgetConfig(
+            backendUrl = this[PrefKeys.BackendUrl]?.takeIf { it.isNotBlank() } ?: DEFAULT_URL,
+            screen = parseScreen(this[PrefKeys.Screen]),
+            inverted = this[PrefKeys.Inverted] == "true",
+            currency = this[PrefKeys.Currency]?.takeIf { it.isNotBlank() }?.uppercase() ?: DEFAULT_CURRENCY,
+            rotationMinutes = this[PrefKeys.RotationMinutes] ?: DEFAULT_ROTATION_MINUTES,
+            rotationScreens = parseScreens(this[PrefKeys.RotationScreens]),
+            digitFont = parseFont(this[PrefKeys.DigitFont]),
+        )
 
     private fun parseFont(name: String?): DigitFont =
         runCatching { DigitFont.valueOf(name ?: "") }.getOrDefault(DEFAULT_FONT)
@@ -129,8 +132,10 @@ object Prefs {
     /** Comma-separated screen names → ordered list, with safe fallback to the full set. */
     private fun parseScreens(value: String?): List<Screen> {
         if (value.isNullOrBlank()) return DEFAULT_ROTATION_SCREENS
-        val parsed = value.split(",")
-            .mapNotNull { name -> runCatching { Screen.valueOf(name.trim()) }.getOrNull() }
+        val parsed =
+            value
+                .split(",")
+                .mapNotNull { name -> runCatching { Screen.valueOf(name.trim()) }.getOrNull() }
         return if (parsed.isEmpty()) DEFAULT_ROTATION_SCREENS else parsed
     }
 }

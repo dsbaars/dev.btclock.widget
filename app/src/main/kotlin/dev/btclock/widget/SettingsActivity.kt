@@ -53,7 +53,6 @@ import kotlinx.coroutines.launch
  *     EXTRA_APPWIDGET_ID so the launcher finishes pinning)
  */
 class SettingsActivity : ComponentActivity() {
-
     private var appWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,10 +72,11 @@ class SettingsActivity : ComponentActivity() {
             MaterialTheme(colorScheme = darkColorScheme()) {
                 Scaffold { padding ->
                     SettingsScreen(
-                        modifier = Modifier
-                            .padding(padding)
-                            .fillMaxSize()
-                            .padding(16.dp),
+                        modifier =
+                            Modifier
+                                .padding(padding)
+                                .fillMaxSize()
+                                .padding(16.dp),
                         onSaved = ::finishWithSuccess,
                     )
                 }
@@ -156,7 +156,8 @@ private fun SettingsScreen(modifier: Modifier = Modifier, onSaved: () -> Unit) {
         OutlinedTextField(
             value = if (rotationMinutes <= 0) "" else rotationMinutes.toString(),
             onValueChange = { input ->
-                rotationMinutes = input.filter { it.isDigit() }
+                rotationMinutes = input
+                    .filter { it.isDigit() }
                     .take(3)
                     .toIntOrNull()
                     ?.coerceIn(0, 240)
@@ -190,16 +191,18 @@ private fun SettingsScreen(modifier: Modifier = Modifier, onSaved: () -> Unit) {
             style = MaterialTheme.typography.titleMedium,
         )
         DigitFont.entries.forEach { font ->
-            val labelRes = when (font) {
-                DigitFont.Antonio -> R.string.font_antonio
-                DigitFont.Oswald -> R.string.font_oswald
-            }
+            val labelRes =
+                when (font) {
+                    DigitFont.Antonio -> R.string.font_antonio
+                    DigitFont.Oswald -> R.string.font_oswald
+                }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .selectable(selected = digitFont == font, onClick = { digitFont = font })
-                    .padding(vertical = 4.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .selectable(selected = digitFont == font, onClick = { digitFont = font })
+                        .padding(vertical = 4.dp),
             ) {
                 RadioButton(selected = digitFont == font, onClick = { digitFont = font })
                 Text(
@@ -255,15 +258,16 @@ private fun SettingsScreen(modifier: Modifier = Modifier, onSaved: () -> Unit) {
  * UI display order; the saved cycle order follows
  * [Screen.entries] regardless of user toggle order.
  */
-private val ROTATION_OPTIONS: List<Pair<Screen, Int>> = listOf(
-    Screen.BlockHeight to R.string.screen_block_height,
-    Screen.Price to R.string.screen_price,
-    Screen.MoscowTime to R.string.screen_moscow_time,
-    Screen.FeeRate to R.string.screen_fee_rate,
-    Screen.Halving to R.string.screen_halving,
-    Screen.MarketCap to R.string.screen_market_cap,
-    Screen.Supply to R.string.screen_supply,
-)
+private val ROTATION_OPTIONS: List<Pair<Screen, Int>> =
+    listOf(
+        Screen.BlockHeight to R.string.screen_block_height,
+        Screen.Price to R.string.screen_price,
+        Screen.MoscowTime to R.string.screen_moscow_time,
+        Screen.FeeRate to R.string.screen_fee_rate,
+        Screen.Halving to R.string.screen_halving,
+        Screen.MarketCap to R.string.screen_market_cap,
+        Screen.Supply to R.string.screen_supply,
+    )
 
 @Composable
 private fun RotationToggle(
@@ -274,9 +278,10 @@ private fun RotationToggle(
     val context = LocalContext.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 2.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 2.dp),
     ) {
         Checkbox(checked = included, onCheckedChange = onChange)
         Text(
@@ -307,9 +312,10 @@ private fun CurrencyPicker(selected: String, onSelect: (String) -> Unit) {
             onValueChange = { onSelect(it.uppercase()) },
             singleLine = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(),
         )
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             for (code in Currencies.OFFERED) {
@@ -335,10 +341,11 @@ private fun ScreenChoice(
     val context = LocalContext.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .selectable(selected = selected == option, onClick = { onSelect(option) })
-            .padding(vertical = 4.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .selectable(selected = selected == option, onClick = { onSelect(option) })
+                .padding(vertical = 4.dp),
     ) {
         RadioButton(selected = selected == option, onClick = { onSelect(option) })
         Text(text = context.getString(labelRes), modifier = Modifier.padding(start = 8.dp))

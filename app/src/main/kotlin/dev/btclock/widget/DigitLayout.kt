@@ -40,75 +40,90 @@ data class PanelText(
 ) {
     enum class Style {
         Empty,
+
         /** Big upright digit (or "."), Antonio. */
         Digit,
+
         /** Big upright currency / unit symbol, Antonio (matches firmware). */
         Symbol,
+
         /** Sat-glyph U+E000 from Satoshi Symbol font. */
         SatGlyph,
+
         /** Two stacked rotated words separated by a horizontal line, Oswald-bold. */
         RotatedSplitLabel,
     }
 
     companion object {
         val Empty = PanelText()
+
         fun digit(c: Char) = PanelText(text = c.toString(), style = Style.Digit)
+
         fun digit(s: String) = PanelText(text = s, style = Style.Digit)
+
         fun symbol(s: String) = PanelText(text = s, style = Style.Symbol)
+
         val SatGlyph = PanelText(text = "", style = Style.SatGlyph)
+
         fun label(top: String, bottom: String) =
             PanelText(style = Style.RotatedSplitLabel, labelTop = top, labelBottom = bottom)
     }
 }
 
 object DigitLayout {
-
     /** Build the per-panel array for [screen] with [panelCount] panels. */
     fun layoutFor(screen: Screen, panelCount: Int, snapshot: BackendSnapshot): List<PanelText> {
         val n = panelCount
         return when (screen) {
-            Screen.BlockHeight -> buildLayout(
-                n = n,
-                label = PanelText.label("BLOCK", "HEIGHT"),
-                main = digitsOf(snapshot.blockHeight),
-            )
+            Screen.BlockHeight ->
+                buildLayout(
+                    n = n,
+                    label = PanelText.label("BLOCK", "HEIGHT"),
+                    main = digitsOf(snapshot.blockHeight),
+                )
 
-            Screen.Price -> buildLayout(
-                n = n,
-                label = PanelText.label("BTC", snapshot.currency),
-                main = priceMain(snapshot.price, snapshot.currency, slotsAvailable = n - 1),
-            )
+            Screen.Price ->
+                buildLayout(
+                    n = n,
+                    label = PanelText.label("BTC", snapshot.currency),
+                    main = priceMain(snapshot.price, snapshot.currency, slotsAvailable = n - 1),
+                )
 
-            Screen.MoscowTime -> buildLayout(
-                n = n,
-                label = PanelText.label("MSCW", "TIME"),
-                main = moscowMain(snapshot.price),
-            )
+            Screen.MoscowTime ->
+                buildLayout(
+                    n = n,
+                    label = PanelText.label("MSCW", "TIME"),
+                    main = moscowMain(snapshot.price),
+                )
 
-            Screen.FeeRate -> buildLayout(
-                n = n,
-                label = PanelText.label("FEE", "RATE"),
-                main = feeMain(snapshot.medianFee),
-                trailingLabel = PanelText.label("sat", "vB"),
-            )
+            Screen.FeeRate ->
+                buildLayout(
+                    n = n,
+                    label = PanelText.label("FEE", "RATE"),
+                    main = feeMain(snapshot.medianFee),
+                    trailingLabel = PanelText.label("sat", "vB"),
+                )
 
-            Screen.Halving -> buildLayout(
-                n = n,
-                label = PanelText.label("HAL", "VING"),
-                main = digitsOf(blocksUntilHalving(snapshot.blockHeight)),
-            )
+            Screen.Halving ->
+                buildLayout(
+                    n = n,
+                    label = PanelText.label("HAL", "VING"),
+                    main = digitsOf(blocksUntilHalving(snapshot.blockHeight)),
+                )
 
-            Screen.MarketCap -> buildLayout(
-                n = n,
-                label = PanelText.label(snapshot.currency, "MCAP"),
-                main = marketCapMain(snapshot.blockHeight, snapshot.price, snapshot.currency, slotsAvailable = n - 1),
-            )
+            Screen.MarketCap ->
+                buildLayout(
+                    n = n,
+                    label = PanelText.label(snapshot.currency, "MCAP"),
+                    main = marketCapMain(snapshot.blockHeight, snapshot.price, snapshot.currency, slotsAvailable = n - 1),
+                )
 
-            Screen.Supply -> buildLayout(
-                n = n,
-                label = PanelText.label("BTC", "SUPPLY"),
-                main = supplyMain(snapshot.blockHeight),
-            )
+            Screen.Supply ->
+                buildLayout(
+                    n = n,
+                    label = PanelText.label("BTC", "SUPPLY"),
+                    main = supplyMain(snapshot.blockHeight),
+                )
         }
     }
 
@@ -126,13 +141,14 @@ object DigitLayout {
         val cells = MutableList(n) { PanelText.Empty }
         cells[0] = label
 
-        val lastMainIdx = if (trailingLabel != null) {
-            cells[n - 1] = trailingLabel
-            n - 2
-        } else {
-            n - 1
-        }
-        val mainSlots = lastMainIdx - 0  // slots 1..lastMainIdx inclusive
+        val lastMainIdx =
+            if (trailingLabel != null) {
+                cells[n - 1] = trailingLabel
+                n - 2
+            } else {
+                n - 1
+            }
+        val mainSlots = lastMainIdx - 0 // slots 1..lastMainIdx inclusive
         val trimmed = if (main.size > mainSlots) main.takeLast(mainSlots) else main
         val firstMainIdx = lastMainIdx - trimmed.size + 1
         for ((i, cell) in trimmed.withIndex()) {
@@ -211,10 +227,11 @@ object DigitLayout {
         val supply = bitcoinSupplyAt(height)
         val cap = supply * price
         val (mantissa, suffix) = humanScale(cap)
-        val mantissaStr = formatMantissaForSlots(
-            mantissa,
-            slotsForMain = slotsAvailable - (if (Currencies.symbol(currency) != null) 2 else 1),
-        )
+        val mantissaStr =
+            formatMantissaForSlots(
+                mantissa,
+                slotsForMain = slotsAvailable - (if (Currencies.symbol(currency) != null) 2 else 1),
+            )
         val out = ArrayList<PanelText>()
         Currencies.symbol(currency)?.let { out += PanelText.symbol(it) }
         mantissaStr.forEach { out += if (it == '.') PanelText(text = ".", style = PanelText.Style.Digit) else PanelText.digit(it) }

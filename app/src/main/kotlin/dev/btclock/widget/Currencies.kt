@@ -10,12 +10,28 @@ package dev.btclock.widget
  * extra currencies still gets something readable.
  */
 object Currencies {
-
     /** Default offering in the Settings picker. Order matters — first entry wins as the fallback. */
-    val OFFERED: List<String> = listOf(
-        "USD", "EUR", "GBP", "JPY", "CAD", "AUD", "CHF", "CNY", "INR",
-        "BRL", "MXN", "RUB", "ZAR", "SEK", "NOK", "DKK", "PLN", "TRY",
-    )
+    val OFFERED: List<String> =
+        listOf(
+            "USD",
+            "EUR",
+            "GBP",
+            "JPY",
+            "CAD",
+            "AUD",
+            "CHF",
+            "CNY",
+            "INR",
+            "BRL",
+            "MXN",
+            "RUB",
+            "ZAR",
+            "SEK",
+            "NOK",
+            "DKK",
+            "PLN",
+            "TRY",
+        )
 
     /**
      * Single-glyph symbols. Keep these to one printable char each so
@@ -24,22 +40,23 @@ object Currencies {
      * "Fr") falls through to the ISO-code path below where the whole
      * code is stacked.
      */
-    private val SYMBOLS: Map<String, String> = mapOf(
-        "USD" to "$",
-        "EUR" to "€",
-        "GBP" to "£",
-        "JPY" to "¥",
-        "CNY" to "¥",
-        "AUD" to "$",
-        "CAD" to "$",
-        "MXN" to "$",
-        "BRL" to "R",   // "R$" is two chars; pick the leading R for the cell, ISO fallback shows full code
-        "INR" to "₹",
-        "RUB" to "₽",
-        "TRY" to "₺",
-        "ZAR" to "R",
-        "CHF" to "₣",   // historic glyph; CHF code is also fine via fallback
-    )
+    private val SYMBOLS: Map<String, String> =
+        mapOf(
+            "USD" to "$",
+            "EUR" to "€",
+            "GBP" to "£",
+            "JPY" to "¥",
+            "CNY" to "¥",
+            "AUD" to "$",
+            "CAD" to "$",
+            "MXN" to "$",
+            "BRL" to "R", // "R$" is two chars; pick the leading R for the cell, ISO fallback shows full code
+            "INR" to "₹",
+            "RUB" to "₽",
+            "TRY" to "₺",
+            "ZAR" to "R",
+            "CHF" to "₣", // historic glyph; CHF code is also fine via fallback
+        )
 
     /**
      * Symbol if we have a single-glyph one; otherwise null. Callers

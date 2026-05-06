@@ -41,7 +41,6 @@ import androidx.glance.unit.ColorProvider
  *   5. RefreshWorker polls    → updates state + calls update(); GOTO 2
  */
 class BTClockWidget : GlanceAppWidget() {
-
     /**
      * Glance state schema. Sharing the same Preferences DataStore for
      * widget state lets multiple instances of the widget keep their
@@ -77,15 +76,16 @@ private fun WidgetContent() {
     // without us having to bind the DataStore flow into Glance
     // directly.
     val cfg by produceState(
-        initialValue = WidgetConfig(
-            backendUrl = "",
-            screen = Screen.BlockHeight,
-            inverted = false,
-            currency = "USD",
-            rotationMinutes = 0,
-            rotationScreens = listOf(Screen.BlockHeight),
-            digitFont = DigitFont.Antonio,
-        ),
+        initialValue =
+            WidgetConfig(
+                backendUrl = "",
+                screen = Screen.BlockHeight,
+                inverted = false,
+                currency = "USD",
+                rotationMinutes = 0,
+                rotationScreens = listOf(Screen.BlockHeight),
+                digitFont = DigitFont.Antonio,
+            ),
     ) {
         Prefs.observe(context).collect { value = it }
     }
@@ -110,24 +110,26 @@ private fun WidgetContent() {
     val heightPx = (size.height.value * density).toInt().coerceAtLeast(1)
 
     val cells = DigitLayout.layoutFor(activeScreen, panelCount = 7, snapshot = snapshot)
-    val renderer = FrameRenderer(
-        context = context,
-        panelCount = 7,
-        inverted = cfg.inverted,
-        digitFont = cfg.digitFont,
-    )
+    val renderer =
+        FrameRenderer(
+            context = context,
+            panelCount = 7,
+            inverted = cfg.inverted,
+            digitFont = cfg.digitFont,
+        )
     val bitmap = renderer.render(widthPx, heightPx, cells)
 
     Box(
-        modifier = GlanceModifier
-            .fillMaxSize()
-            // Tap → advance to the next screen in the rotation cycle.
-            // No-op when only 0 or 1 screens are selected. Settings
-            // is reachable from the launcher icon (the widget is
-            // configured automatically on first add via
-            // android:configure in btclock_widget_info.xml).
-            .clickable(actionRunCallback<AdvanceScreenAction>())
-            .background(ColorProvider(Color.Black)),
+        modifier =
+            GlanceModifier
+                .fillMaxSize()
+                // Tap → advance to the next screen in the rotation cycle.
+                // No-op when only 0 or 1 screens are selected. Settings
+                // is reachable from the launcher icon (the widget is
+                // configured automatically on first add via
+                // android:configure in btclock_widget_info.xml).
+                .clickable(actionRunCallback<AdvanceScreenAction>())
+                .background(ColorProvider(Color.Black)),
     ) {
         Image(
             provider = ImageProvider(bitmap),

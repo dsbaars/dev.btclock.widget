@@ -14,7 +14,6 @@ import androidx.glance.appwidget.GlanceAppWidgetReceiver
  * add and tear it down when the user removes the last instance.
  */
 class BTClockWidgetReceiver : GlanceAppWidgetReceiver() {
-
     override val glanceAppWidget: GlanceAppWidget = BTClockWidget()
 
     override fun onEnabled(context: Context) {
