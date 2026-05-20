@@ -24,10 +24,14 @@ val releaseKeyPassword: String? = localProps.getProperty("releaseKeyPassword")
  */
 fun gitCommitShort(): String =
     runCatching {
-        val process = ProcessBuilder("git", "rev-parse", "--short", "HEAD")
-            .redirectErrorStream(true)
-            .start()
-        process.inputStream.bufferedReader().readText().trim()
+        val process =
+            ProcessBuilder("git", "rev-parse", "--short", "HEAD")
+                .redirectErrorStream(true)
+                .start()
+        process.inputStream
+            .bufferedReader()
+            .readText()
+            .trim()
     }.getOrDefault("unknown")
 
 android {
