@@ -39,9 +39,18 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+
+/** BTClock-brand gold (bright stop of the wordmark gradient). */
+private val GoldColor = Color(0xFFF1C64A)
+private val UbuntuMediumItalic = FontFamily(Font(R.font.ubuntu_medium_italic))
 
 /**
  * Tiny configuration screen — backend URL, default screen, inverted
@@ -125,7 +134,14 @@ private fun SettingsScreen(modifier: Modifier = Modifier, onSaved: () -> Unit) {
         modifier = modifier.verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text(text = context.getString(R.string.app_name), style = MaterialTheme.typography.titleLarge)
+        Text(
+            text = context.getString(R.string.app_name),
+            color = GoldColor,
+            fontFamily = UbuntuMediumItalic,
+            fontSize = 36.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+        )
 
         OutlinedTextField(
             value = url,
