@@ -50,15 +50,18 @@ class FrameRenderer(
     }
 
     /**
-     * Typefaces match the firmware:
-     *   digits / symbols → Antonio (default `fontFamily=0`)
-     *   labels           → Oswald-bold (separate AppFonts slot for the
-     *                      panel-0 rotated description, not affected
-     *                      by the user's digit-face pick on the device)
+     * Typefaces:
+     *   digits / symbols → user's DigitFont pick (Antonio / Oswald / Ubuntu)
+     *   labels           → the bold companion of the same DigitFont, so
+     *                      "BLOCK / HEIGHT" stays in one family instead
+     *                      of mixing the chosen digit face with a fixed
+     *                      Oswald label. Firmware uses a separate
+     *                      AppFonts slot here, but on a phone-sized
+     *                      widget one consistent family reads cleaner.
      *   sat glyph        → SatoshiSymbol.ttf, U+E000
      */
     private val digitTypeface: Typeface by lazy { loadFont(digitFont.resourceName, Typeface.NORMAL) }
-    private val labelTypeface: Typeface by lazy { loadFont("oswald_bold", Typeface.BOLD) }
+    private val labelTypeface: Typeface by lazy { loadFont(digitFont.labelResourceName, Typeface.BOLD) }
     private val satTypeface: Typeface by lazy { loadFont("satoshi_symbol", Typeface.NORMAL) }
 
     private val pcbPaint =

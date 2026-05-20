@@ -42,10 +42,16 @@ object PrefKeys {
  */
 enum class DigitFont(
     val resourceName: String,
+    /**
+     * Bold companion used for the rotated split-label (panel 0 on every
+     * screen). Pairs with the digit face so a Ubuntu digit pick reads
+     * "BLOCK / HEIGHT" in Ubuntu Bold instead of mixing with Oswald.
+     */
+    val labelResourceName: String,
 ) {
-    Antonio(resourceName = "antonio_regular"),
-    Oswald(resourceName = "oswald_regular"),
-    Ubuntu(resourceName = "ubuntu_medium"),
+    Antonio(resourceName = "antonio_regular", labelResourceName = "antonio_bold"),
+    Oswald(resourceName = "oswald_regular", labelResourceName = "oswald_bold"),
+    Ubuntu(resourceName = "ubuntu_medium", labelResourceName = "ubuntu_bold"),
 }
 
 data class WidgetConfig(
