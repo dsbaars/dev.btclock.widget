@@ -17,6 +17,19 @@ val releaseStorePassword: String? = localProps.getProperty("releaseStorePassword
 val releaseKeyAlias: String? = localProps.getProperty("releaseKeyAlias")
 val releaseKeyPassword: String? = localProps.getProperty("releaseKeyPassword")
 
+/**
+ * Short HEAD commit hash, baked into BuildConfig so the settings screen
+ * can show users which build they're on. Returns "unknown" outside a
+ * git tree (e.g. when building from a source tarball).
+ */
+fun gitCommitShort(): String =
+    runCatching {
+        val process = ProcessBuilder("git", "rev-parse", "--short", "HEAD")
+            .redirectErrorStream(true)
+            .start()
+        process.inputStream.bufferedReader().readText().trim()
+    }.getOrDefault("unknown")
+
 android {
     namespace = "dev.btclock.widget"
     compileSdk = 35
@@ -27,6 +40,7 @@ android {
         targetSdk = 35
         versionCode = 3
         versionName = "0.1.2"
+        buildConfigField("String", "GIT_COMMIT", "\"${gitCommitShort()}\"")
     }
 
     signingConfigs {
@@ -71,6 +85,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
