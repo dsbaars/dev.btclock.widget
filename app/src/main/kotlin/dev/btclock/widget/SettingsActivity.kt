@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,9 +42,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
@@ -130,10 +133,9 @@ private fun SettingsScreen(modifier: Modifier = Modifier, onSaved: () -> Unit) {
         digitFont = cfg.digitFont
     }
 
-    Column(
-        modifier = modifier.verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
+    val uriHandler = LocalUriHandler.current
+
+    Column(modifier = modifier.verticalScroll(rememberScrollState())) {
         Text(
             text = context.getString(R.string.app_name),
             color = GoldColor,
@@ -142,6 +144,7 @@ private fun SettingsScreen(modifier: Modifier = Modifier, onSaved: () -> Unit) {
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
         )
+        Spacer(Modifier.height(20.dp))
 
         OutlinedTextField(
             value = url,
@@ -152,88 +155,89 @@ private fun SettingsScreen(modifier: Modifier = Modifier, onSaved: () -> Unit) {
             modifier = Modifier.fillMaxWidth(),
         )
 
-        Text(text = context.getString(R.string.screen_label), style = MaterialTheme.typography.titleMedium)
-        ScreenChoice(R.string.screen_block_height, Screen.BlockHeight, screen) { screen = it }
-        ScreenChoice(R.string.screen_price, Screen.Price, screen) { screen = it }
-        ScreenChoice(R.string.screen_moscow_time, Screen.MoscowTime, screen) { screen = it }
-        ScreenChoice(R.string.screen_fee_rate, Screen.FeeRate, screen) { screen = it }
-        ScreenChoice(R.string.screen_halving, Screen.Halving, screen) { screen = it }
-        ScreenChoice(R.string.screen_market_cap, Screen.MarketCap, screen) { screen = it }
-        ScreenChoice(R.string.screen_supply, Screen.Supply, screen) { screen = it }
-
-        Text(
-            text = context.getString(R.string.rotation_label),
-            style = MaterialTheme.typography.titleMedium,
-        )
-        Text(
-            text = context.getString(R.string.rotation_hint),
-            style = MaterialTheme.typography.bodySmall,
-        )
-        OutlinedTextField(
-            value = if (rotationMinutes <= 0) "" else rotationMinutes.toString(),
-            onValueChange = { input ->
-                rotationMinutes = input
-                    .filter { it.isDigit() }
-                    .take(3)
-                    .toIntOrNull()
-                    ?.coerceIn(0, 240)
-                    ?: 0
-            },
-            label = { Text(context.getString(R.string.rotation_minutes_label)) },
-            placeholder = { Text("0 (off)") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-        )
-
-        Text(
-            text = context.getString(R.string.rotation_screens_label),
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        ROTATION_OPTIONS.forEach { (sc, labelRes) ->
-            RotationToggle(
-                labelRes = labelRes,
-                included = sc in rotationScreens,
-                onChange = { on ->
-                    rotationScreens = if (on) rotationScreens + sc else rotationScreens - sc
-                },
-            )
+        Section(title = context.getString(R.string.screen_label)) {
+            ScreenChoice(R.string.screen_block_height, Screen.BlockHeight, screen) { screen = it }
+            ScreenChoice(R.string.screen_price, Screen.Price, screen) { screen = it }
+            ScreenChoice(R.string.screen_moscow_time, Screen.MoscowTime, screen) { screen = it }
+            ScreenChoice(R.string.screen_fee_rate, Screen.FeeRate, screen) { screen = it }
+            ScreenChoice(R.string.screen_halving, Screen.Halving, screen) { screen = it }
+            ScreenChoice(R.string.screen_market_cap, Screen.MarketCap, screen) { screen = it }
+            ScreenChoice(R.string.screen_supply, Screen.Supply, screen) { screen = it }
         }
 
-        Text(text = context.getString(R.string.currency_label), style = MaterialTheme.typography.titleMedium)
-        CurrencyPicker(selected = currency, onSelect = { currency = it })
-
-        Text(
-            text = context.getString(R.string.font_label),
-            style = MaterialTheme.typography.titleMedium,
-        )
-        DigitFont.entries.forEach { font ->
-            val labelRes =
-                when (font) {
-                    DigitFont.Antonio -> R.string.font_antonio
-                    DigitFont.Oswald -> R.string.font_oswald
-                }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .selectable(selected = digitFont == font, onClick = { digitFont = font })
-                        .padding(vertical = 4.dp),
-            ) {
-                RadioButton(selected = digitFont == font, onClick = { digitFont = font })
-                Text(
-                    text = context.getString(labelRes),
-                    modifier = Modifier.padding(start = 8.dp),
+        Section(
+            title = context.getString(R.string.rotation_label),
+            hint = context.getString(R.string.rotation_hint),
+        ) {
+            OutlinedTextField(
+                value = if (rotationMinutes <= 0) "" else rotationMinutes.toString(),
+                onValueChange = { input ->
+                    rotationMinutes = input
+                        .filter { it.isDigit() }
+                        .take(3)
+                        .toIntOrNull()
+                        ?.coerceIn(0, 240)
+                        ?: 0
+                },
+                label = { Text(context.getString(R.string.rotation_minutes_label)) },
+                placeholder = { Text("0 (off)") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = context.getString(R.string.rotation_screens_label),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            ROTATION_OPTIONS.forEach { (sc, labelRes) ->
+                RotationToggle(
+                    labelRes = labelRes,
+                    included = sc in rotationScreens,
+                    onChange = { on ->
+                        rotationScreens = if (on) rotationScreens + sc else rotationScreens - sc
+                    },
                 )
             }
         }
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Section(title = context.getString(R.string.currency_label)) {
+            CurrencyPicker(selected = currency, onSelect = { currency = it })
+        }
+
+        Section(title = context.getString(R.string.font_label)) {
+            DigitFont.entries.forEach { font ->
+                val labelRes =
+                    when (font) {
+                        DigitFont.Antonio -> R.string.font_antonio
+                        DigitFont.Oswald -> R.string.font_oswald
+                    }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(selected = digitFont == font, onClick = { digitFont = font }),
+                ) {
+                    RadioButton(selected = digitFont == font, onClick = { digitFont = font })
+                    Text(text = context.getString(labelRes))
+                }
+            }
+        }
+
+        Spacer(Modifier.height(8.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .selectable(selected = inverted, onClick = { inverted = !inverted }),
+        ) {
             Checkbox(checked = inverted, onCheckedChange = { inverted = it })
-            Spacer(Modifier.height(0.dp))
             Text(text = "Inverted (white on black)")
         }
 
+        Spacer(Modifier.height(20.dp))
         Button(
             onClick = {
                 scope.launch {
@@ -266,7 +270,53 @@ private fun SettingsScreen(modifier: Modifier = Modifier, onSaved: () -> Unit) {
         ) {
             Text(context.getString(R.string.save))
         }
+
+        Spacer(Modifier.height(12.dp))
+        Text(
+            text = "Get the real BTClock at btclock.store",
+            color = GoldColor,
+            fontSize = 14.sp,
+            textAlign = TextAlign.Center,
+            textDecoration = TextDecoration.Underline,
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable { uriHandler.openUri("https://btclock.store") }
+                    .padding(vertical = 8.dp),
+        )
     }
+}
+
+/**
+ * Section with a small uppercase-style gold title and tightly-packed
+ * content beneath it. The outer column doesn't use spacedBy, so each
+ * Section provides its own top spacing — that lets dense rows
+ * (checkboxes / radios) sit flush against each other while sections
+ * stay clearly separated.
+ */
+@Composable
+private fun Section(
+    title: String,
+    hint: String? = null,
+    content: @Composable () -> Unit,
+) {
+    Spacer(Modifier.height(20.dp))
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleSmall,
+        color = GoldColor,
+    )
+    if (hint != null) {
+        Text(
+            text = hint,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 2.dp, bottom = 6.dp),
+        )
+    } else {
+        Spacer(Modifier.height(4.dp))
+    }
+    content()
 }
 
 /**
@@ -297,13 +347,10 @@ private fun RotationToggle(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = 2.dp),
+                .selectable(selected = included, onClick = { onChange(!included) }),
     ) {
         Checkbox(checked = included, onCheckedChange = onChange)
-        Text(
-            text = context.getString(labelRes),
-            modifier = Modifier.padding(start = 8.dp),
-        )
+        Text(text = context.getString(labelRes))
     }
 }
 
@@ -360,10 +407,9 @@ private fun ScreenChoice(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .selectable(selected = selected == option, onClick = { onSelect(option) })
-                .padding(vertical = 4.dp),
+                .selectable(selected = selected == option, onClick = { onSelect(option) }),
     ) {
         RadioButton(selected = selected == option, onClick = { onSelect(option) })
-        Text(text = context.getString(labelRes), modifier = Modifier.padding(start = 8.dp))
+        Text(text = context.getString(labelRes))
     }
 }
