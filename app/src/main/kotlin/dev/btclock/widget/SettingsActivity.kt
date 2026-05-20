@@ -19,19 +19,25 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,17 +49,60 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 
 /** BTClock-brand gold (bright stop of the wordmark gradient). */
 private val GoldColor = Color(0xFFF1C64A)
-private val UbuntuMediumItalic = FontFamily(Font(R.font.ubuntu_medium_italic))
+
+/**
+ * The BTClock device, dashboard, and store all use Ubuntu — pulling the
+ * settings screen into the same family keeps the brand consistent
+ * everywhere the user sees BTClock branding.
+ */
+private val Ubuntu =
+    FontFamily(
+        Font(R.font.ubuntu_regular, FontWeight.Normal),
+        Font(R.font.ubuntu_medium, FontWeight.Medium),
+        Font(R.font.ubuntu_bold, FontWeight.Bold),
+        Font(R.font.ubuntu_medium_italic, FontWeight.Medium, FontStyle.Italic),
+    )
+
+/**
+ * Apply Ubuntu to every Material 3 text style without restating each
+ * size / weight / line-height. Built off the M3 defaults so spacings
+ * and line metrics stay correct.
+ */
+private val UbuntuTypography: Typography =
+    Typography().run {
+        val withUbuntu: (TextStyle) -> TextStyle = { it.copy(fontFamily = Ubuntu) }
+        copy(
+            displayLarge = withUbuntu(displayLarge),
+            displayMedium = withUbuntu(displayMedium),
+            displaySmall = withUbuntu(displaySmall),
+            headlineLarge = withUbuntu(headlineLarge),
+            headlineMedium = withUbuntu(headlineMedium),
+            headlineSmall = withUbuntu(headlineSmall),
+            titleLarge = withUbuntu(titleLarge),
+            titleMedium = withUbuntu(titleMedium),
+            titleSmall = withUbuntu(titleSmall),
+            bodyLarge = withUbuntu(bodyLarge),
+            bodyMedium = withUbuntu(bodyMedium),
+            bodySmall = withUbuntu(bodySmall),
+            labelLarge = withUbuntu(labelLarge),
+            labelMedium = withUbuntu(labelMedium),
+            labelSmall = withUbuntu(labelSmall),
+        )
+    }
 
 /**
  * Tiny configuration screen — backend URL, default screen, inverted
@@ -81,16 +130,28 @@ class SettingsActivity : ComponentActivity() {
         }
 
         setContent {
-            MaterialTheme(colorScheme = darkColorScheme()) {
-                Scaffold { padding ->
-                    SettingsScreen(
-                        modifier =
-                            Modifier
-                                .padding(padding)
-                                .fillMaxSize()
-                                .padding(16.dp),
-                        onSaved = ::finishWithSuccess,
-                    )
+            MaterialTheme(
+                colorScheme = darkColorScheme(),
+                typography = UbuntuTypography,
+            ) {
+                // Drop Material's 48dp minimum tap target so checkbox /
+                // radio rows can sit at their visual size (~28dp) and
+                // stack tightly. Touch hit area is preserved by the
+                // surrounding Row.selectable() which still expands to
+                // fill the row width.
+                CompositionLocalProvider(
+                    LocalMinimumInteractiveComponentSize provides Dp.Unspecified,
+                ) {
+                    Scaffold { padding ->
+                        SettingsScreen(
+                            modifier =
+                                Modifier
+                                    .padding(padding)
+                                    .fillMaxSize()
+                                    .padding(horizontal = 20.dp, vertical = 16.dp),
+                            onSaved = ::finishWithSuccess,
+                        )
+                    }
                 }
             }
         }
@@ -139,12 +200,14 @@ private fun SettingsScreen(modifier: Modifier = Modifier, onSaved: () -> Unit) {
         Text(
             text = context.getString(R.string.app_name),
             color = GoldColor,
-            fontFamily = UbuntuMediumItalic,
-            fontSize = 36.sp,
+            fontFamily = Ubuntu,
+            fontWeight = FontWeight.Medium,
+            fontStyle = FontStyle.Italic,
+            fontSize = 34.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
         )
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(14.dp))
 
         OutlinedTextField(
             value = url,
@@ -152,6 +215,7 @@ private fun SettingsScreen(modifier: Modifier = Modifier, onSaved: () -> Unit) {
             label = { Text(context.getString(R.string.backend_label)) },
             placeholder = { Text(context.getString(R.string.backend_hint)) },
             singleLine = true,
+            textStyle = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.fillMaxWidth(),
         )
 
@@ -182,6 +246,7 @@ private fun SettingsScreen(modifier: Modifier = Modifier, onSaved: () -> Unit) {
                 label = { Text(context.getString(R.string.rotation_minutes_label)) },
                 placeholder = { Text("0 (off)") },
                 singleLine = true,
+                textStyle = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(8.dp))
@@ -211,31 +276,22 @@ private fun SettingsScreen(modifier: Modifier = Modifier, onSaved: () -> Unit) {
                     when (font) {
                         DigitFont.Antonio -> R.string.font_antonio
                         DigitFont.Oswald -> R.string.font_oswald
+                        DigitFont.Ubuntu -> R.string.font_ubuntu
                     }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .selectable(selected = digitFont == font, onClick = { digitFont = font }),
-                ) {
-                    RadioButton(selected = digitFont == font, onClick = { digitFont = font })
-                    Text(text = context.getString(labelRes))
-                }
+                TightRow(
+                    selected = digitFont == font,
+                    onClick = { digitFont = font },
+                    label = context.getString(labelRes),
+                )
             }
         }
 
-        Spacer(Modifier.height(8.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .selectable(selected = inverted, onClick = { inverted = !inverted }),
-        ) {
-            Checkbox(checked = inverted, onCheckedChange = { inverted = it })
-            Text(text = "Inverted (white on black)")
-        }
+        Spacer(Modifier.height(14.dp))
+        TightRow(
+            checked = inverted,
+            onCheckedChange = { inverted = it },
+            label = "Inverted (white on black)",
+        )
 
         Spacer(Modifier.height(20.dp))
         Button(
@@ -266,33 +322,49 @@ private fun SettingsScreen(modifier: Modifier = Modifier, onSaved: () -> Unit) {
                     onSaved()
                 }
             },
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = GoldColor,
+                    contentColor = Color.Black,
+                ),
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(context.getString(R.string.save))
+            Text(
+                context.getString(R.string.save),
+                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+            )
         }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(10.dp))
+        Text(
+            text = "v${BuildConfig.VERSION_NAME} · ${BuildConfig.GIT_COMMIT}",
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.labelSmall,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Spacer(Modifier.height(6.dp))
         Text(
             text = "Get the real BTClock at btclock.store",
             color = GoldColor,
-            fontSize = 14.sp,
+            style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             textDecoration = TextDecoration.Underline,
             modifier =
                 Modifier
                     .fillMaxWidth()
                     .clickable { uriHandler.openUri("https://btclock.store") }
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = 6.dp),
         )
     }
 }
 
 /**
- * Section with a small uppercase-style gold title and tightly-packed
- * content beneath it. The outer column doesn't use spacedBy, so each
- * Section provides its own top spacing — that lets dense rows
- * (checkboxes / radios) sit flush against each other while sections
- * stay clearly separated.
+ * Section with a small uppercase gold title and tightly-packed content
+ * beneath it. The outer column doesn't use spacedBy, so each Section
+ * provides its own top spacing — that lets dense rows (checkboxes /
+ * radios) sit flush against each other while sections stay clearly
+ * separated.
  */
 @Composable
 private fun Section(
@@ -300,23 +372,83 @@ private fun Section(
     hint: String? = null,
     content: @Composable () -> Unit,
 ) {
-    Spacer(Modifier.height(20.dp))
+    Spacer(Modifier.height(18.dp))
     Text(
-        text = title,
-        style = MaterialTheme.typography.titleSmall,
+        text = title.uppercase(),
+        style =
+            MaterialTheme.typography.labelLarge.copy(
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.2.sp,
+            ),
         color = GoldColor,
     )
     if (hint != null) {
         Text(
             text = hint,
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 2.dp, bottom = 6.dp),
         )
     } else {
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(6.dp))
     }
     content()
+}
+
+/**
+ * Tight checkbox / radio row. Pulls the indicator to ~24dp via
+ * Modifier.size, uses a 6dp gap to the label, and lets the surrounding
+ * .selectable() drive the tap target — combined with the
+ * LocalMinimumInteractiveComponentSize override at the theme level,
+ * rows end up ~28dp tall instead of the Material default 48dp.
+ */
+@Composable
+private fun TightRow(
+    selected: Boolean,
+    onClick: () -> Unit,
+    label: String,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .selectable(selected = selected, onClick = onClick)
+                .padding(vertical = 2.dp),
+    ) {
+        RadioButton(
+            selected = selected,
+            onClick = onClick,
+            modifier = Modifier.padding(end = 4.dp),
+            colors = RadioButtonDefaults.colors(selectedColor = GoldColor),
+        )
+        Text(text = label, style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
+/** Checkbox variant of [TightRow]. */
+@Composable
+private fun TightRow(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    label: String,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .selectable(selected = checked, onClick = { onCheckedChange(!checked) })
+                .padding(vertical = 2.dp),
+    ) {
+        Checkbox(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            modifier = Modifier.padding(end = 4.dp),
+            colors = CheckboxDefaults.colors(checkedColor = GoldColor),
+        )
+        Text(text = label, style = MaterialTheme.typography.bodyLarge)
+    }
 }
 
 /**
@@ -342,16 +474,7 @@ private fun RotationToggle(
     onChange: (Boolean) -> Unit,
 ) {
     val context = LocalContext.current
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .selectable(selected = included, onClick = { onChange(!included) }),
-    ) {
-        Checkbox(checked = included, onCheckedChange = onChange)
-        Text(text = context.getString(labelRes))
-    }
+    TightRow(checked = included, onCheckedChange = onChange, label = context.getString(labelRes))
 }
 
 /**
@@ -402,14 +525,9 @@ private fun ScreenChoice(
     onSelect: (Screen) -> Unit,
 ) {
     val context = LocalContext.current
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .selectable(selected = selected == option, onClick = { onSelect(option) }),
-    ) {
-        RadioButton(selected = selected == option, onClick = { onSelect(option) })
-        Text(text = context.getString(labelRes))
-    }
+    TightRow(
+        selected = selected == option,
+        onClick = { onSelect(option) },
+        label = context.getString(labelRes),
+    )
 }
