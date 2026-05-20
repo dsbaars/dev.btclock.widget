@@ -24,4 +24,5 @@
     <string name="font_label">Digit font</string>
     <string name="font_antonio">Antonio</string>
     <string name="font_oswald">Oswald</string>
+    <string name="font_ubuntu">Ubuntu</string>
 </resources>

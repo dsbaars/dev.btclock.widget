@@ -45,6 +45,7 @@ enum class DigitFont(
 ) {
     Antonio(resourceName = "antonio_regular"),
     Oswald(resourceName = "oswald_regular"),
+    Ubuntu(resourceName = "ubuntu_medium"),
 }
 
 data class WidgetConfig(
