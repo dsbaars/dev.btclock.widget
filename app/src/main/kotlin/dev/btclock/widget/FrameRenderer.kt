@@ -251,7 +251,8 @@ class FrameRenderer(
                 if (fit < smallest) smallest = fit
             }
         }
-        return if (smallest.isFinite()) smallest else innerHPx * 0.30f
+        val base = if (smallest.isFinite()) smallest else innerHPx * 0.30f
+        return base * digitFont.labelScale
     }
 
     private fun drawPanelContent(canvas: Canvas, inner: RectF, content: PanelText, sharedLabelSize: Float) {

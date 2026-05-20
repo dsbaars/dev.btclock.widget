@@ -48,10 +48,19 @@ enum class DigitFont(
      * "BLOCK / HEIGHT" in Ubuntu Bold instead of mixing with Oswald.
      */
     val labelResourceName: String,
+    /**
+     * Per-face label trim. Oswald Bold is our reference at 1.0 — its
+     * narrow proportions are what the cap-height/width fitter targets.
+     * Antonio Bold and Ubuntu Bold render visually heavier at the same
+     * fitter output (denser strokes / different cap-to-em ratio), so we
+     * shrink the fitted size to keep the label sitting at the same
+     * optical weight across faces.
+     */
+    val labelScale: Float = 1.0f,
 ) {
-    Antonio(resourceName = "antonio_regular", labelResourceName = "antonio_bold"),
+    Antonio(resourceName = "antonio_regular", labelResourceName = "antonio_bold", labelScale = 0.88f),
     Oswald(resourceName = "oswald_regular", labelResourceName = "oswald_bold"),
-    Ubuntu(resourceName = "ubuntu_medium", labelResourceName = "ubuntu_bold"),
+    Ubuntu(resourceName = "ubuntu_medium", labelResourceName = "ubuntu_bold", labelScale = 0.88f),
 }
 
 data class WidgetConfig(
