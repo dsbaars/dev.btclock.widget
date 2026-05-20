@@ -33,8 +33,10 @@ widget works out-of-the-box without running anything yourself.
 - **Multi-currency** — pick from USD / EUR / GBP / JPY / CAD / AUD /
   CHF / CNY / INR / BRL / MXN / RUB / ZAR / SEK / NOK / DKK / PLN /
   TRY in the picker, or type any ISO code your ws-node exposes
-- **Antonio / Oswald font picker** — both vendored from the firmware,
-  switchable at runtime
+- **Antonio / Oswald / Ubuntu font picker** — Antonio and Oswald are
+  vendored from the firmware; Ubuntu is the BTClock brand face used in
+  the dashboard and store. All three are switchable at runtime and
+  bring their matching bold companion along for the split-label
 - **Inverted palette** (white-on-black) toggle
 - **Custom backend URL** for self-hosted ws-nodes; same widget code,
   point it at `http://your-host:8080` from the Settings activity
@@ -69,8 +71,13 @@ time you pin the widget.
 | Price currency | USD | Which entry of `/api/lastprice` to render |
 | Auto-rotate interval | 1 minute | `0` disables; ≥ 1 advances through the rotation set on a timer |
 | Include in rotation | All seven screens | Tick-list of screens the rotation cycle visits |
-| Digit font | Antonio | Antonio (firmware default) or Oswald |
+| Digit font | Antonio | Antonio (firmware default), Oswald, or Ubuntu (brand face) |
 | Inverted | off | White-on-black panels |
+
+The settings screen is themed in Ubuntu with BTClock gold accents and
+shows the current `versionName · git short hash` beneath the Save
+button. A "Get the real BTClock at btclock.store" link below that
+points at the hardware store.
 
 Saves trigger an immediate one-shot refresh so you can verify your
 URL works without waiting for the next periodic tick.
@@ -136,8 +143,10 @@ The geometry constants in `app/src/main/kotlin/dev/btclock/widget/FrameGeometry.
 are a direct port of the firmware's WASM rendering pipeline at
 [`btclock_v4/tools/wasm/render_doc_screens.mjs`](https://git.btclock.dev/btclock/btclock_v4)
 — same mm dimensions for the PCB, panel cutouts, gold-ring offset,
-screw inset, and wordmark baseline. Update both together when the
-hardware changes.
+and wordmark baseline. Update both together when the hardware
+changes. The four corner mounting-screw discs the firmware draws are
+deliberately omitted on the widget — at phone-widget scale they read
+as noise around the panel row.
 
 The "BTClock" italic wordmark (`Wordmark.kt`) is baked from Ubuntu
 Medium Italic as a single SVG path, parsed once via
@@ -178,17 +187,32 @@ client-side from the block height — no separate API calls needed.
 
 | File | Source | Used for |
 |---|---|---|
-| `antonio_regular.ttf` | `Antonio.ttf` | Default digit face (firmware `fontFamily=0`) |
-| `antonio_bold.ttf` | `AntonioBold.ttf` | Reserved for future bold variants |
-| `oswald_regular.ttf` | `Oswald.ttf` | Alternative digit face |
-| `oswald_bold.ttf` | `OswaldBold.ttf` | Panel-0 split-label face |
+| `antonio_regular.ttf` | `Antonio.ttf` | Antonio digit face (firmware `fontFamily=0`) |
+| `antonio_bold.ttf` | `AntonioBold.ttf` | Panel-0 split-label when Antonio digits are picked |
+| `oswald_regular.ttf` | `Oswald.ttf` | Oswald digit face |
+| `oswald_bold.ttf` | `OswaldBold.ttf` | Panel-0 split-label when Oswald digits are picked |
+| `ubuntu_regular.ttf` | Google Fonts (Ubuntu) | Settings-screen body text |
+| `ubuntu_medium.ttf` | Google Fonts (Ubuntu) | Ubuntu digit face + settings-screen labels |
+| `ubuntu_bold.ttf` | Google Fonts (Ubuntu) | Panel-0 split-label when Ubuntu digits are picked + settings section titles |
+| `ubuntu_medium_italic.ttf` | Google Fonts (Ubuntu) | "BTClock Widget" header on the settings screen |
 | `satoshi_symbol.ttf` | `SatoshiSymbol.ttf` | Sat-glyph at U+E000..U+E00F |
 
-All five are pulled from
+The Antonio / Oswald / Satoshi-Symbol faces come from
 [btclock_v4/components/fonts/assets/](https://git.btclock.dev/btclock/btclock_v4)
-on the firmware repo so the widget renders use the same glyphs the
-device prints. Re-vendor by copying from a fresh checkout of that
-repo.
+so the widget renders use the same glyphs the device prints — re-vendor
+by copying from a fresh checkout of that repo. The Ubuntu family is
+the BTClock brand face used by the dashboard, store, and silkscreen
+wordmark; the TTFs are fetched once from Google Fonts (Ubuntu Font
+Licence) and checked in directly so the build doesn't depend on
+network at compile time.
+
+Each [`DigitFont`](app/src/main/kotlin/dev/btclock/widget/Prefs.kt)
+entry carries both `resourceName` (digit face) and `labelResourceName`
+(its bold companion) so the rotated split-label tracks the digit pick
+— picking Ubuntu digits prints "BLOCK / HEIGHT" in Ubuntu Bold rather
+than mixing with an Oswald label. A per-face `labelScale` keeps the
+fitted label optically balanced across the three faces (Oswald = 1.0
+reference, Antonio / Ubuntu trimmed to 0.88 to match its weight).
 
 ## File map
 
@@ -198,7 +222,7 @@ All Kotlin sources live under `app/src/main/kotlin/dev/btclock/widget/`:
 |---|---|
 | `BTClockWidget.kt` | Glance entrypoint — reads state + prefs, renders the bitmap, ships to RemoteViews |
 | `BTClockWidgetReceiver.kt` | AppWidgetProvider bridge; schedules the periodic Worker + the rotation alarm on first widget pin |
-| `FrameRenderer.kt` | Canvas drawing — PCB, panel windows, gold rings, screws, wordmark, digits, split labels |
+| `FrameRenderer.kt` | Canvas drawing — PCB, panel windows, gold rings, wordmark, digits, split labels. Aspect-fits the BTClock frame inside any cell so wider-than-spec launchers (Nova / Niagara 5×1) letterbox cleanly instead of clipping the panels |
 | `FrameGeometry.kt` | mm-dimension constants ported from the firmware WASM pipeline |
 | `Wordmark.kt` | "BTClock" italic silkscreen path, baked from Ubuntu Medium |
 | `DigitLayout.kt` | Per-screen split of value text across the panel row + Bitcoin issuance maths |
@@ -216,7 +240,7 @@ All Kotlin sources live under `app/src/main/kotlin/dev/btclock/widget/`:
 Manifest + resources:
 
 - `AndroidManifest.xml` — receivers, activity, icon, INTERNET permission
-- `res/xml/btclock_widget_info.xml` — widget metadata (5 × 1 cell, resizable)
+- `res/xml/btclock_widget_info.xml` — widget metadata (target 5 × 1 cell, resizable). On Nova / Niagara the 5×1 default cell tends to be wider than the BTClock's 2.7:1 — resize the widget to 4×1 on those launchers for a snug fit
 - `res/drawable/ic_launcher_foreground.xml` — adaptive-icon foreground (three panels with gold rings)
 - `res/drawable/ic_launcher_background.xml` — solid `#0A0A0A` PCB background
 - `res/mipmap-anydpi-v26/ic_launcher{,_round}.xml` — adaptive-icon manifests
