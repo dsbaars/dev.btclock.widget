@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">BTClock Widget</string>
     <string name="widget_label">BTClock</string>
-    <string name="widget_description">Live Bitcoin block height, price, and fee rendered in BTClock\'s display style.</string>
+    <string name="widget_description">Live Bitcoin block height, price, and fee rendered in BTClock\'s display style. Tip: on Nova / Niagara, resize to 4×1 for the best fit — those launchers\' default 5×1 cell is wider than the BTClock aspect.</string>
     <string name="widget_loading">Connecting…</string>
     <string name="settings_label">BTClock Widget Settings</string>
     <string name="backend_label">Backend (ws-node) URL</string>

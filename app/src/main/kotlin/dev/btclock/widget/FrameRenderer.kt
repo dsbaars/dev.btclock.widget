@@ -125,13 +125,16 @@ class FrameRenderer(
     private val REFERENCE_CAP = "8"
 
     /**
-     * Render at [widthPx]×[heightPx]. Width-based scaling: pxPerMm is
-     * always set to fill the widget width, so the BTClock frame's
-     * left-and-right chrome (screws, wordmark edges) is always
-     * visible. If the widget cell is taller than the BTClock aspect,
-     * the frame letterboxes vertically and centres. If shorter, the
-     * frame overflows top/bottom — caller-acceptable per user spec
-     * ("a bit of overflow is okay").
+     * Render at [widthPx]×[heightPx]. Aspect-fit scaling: pxPerMm is
+     * the smaller of the per-axis scales so the BTClock's native
+     * 2.7:1 frame always fits fully inside the cell with PCB-black
+     * letterbox bars on whichever axis has slack. Width-fit-with-
+     * overflow was the original strategy ("a bit of overflow is
+     * okay"), but on Nova / Niagara the row-style 5×1 cells can be
+     * ~6:1 or wider, which made the vertical overflow clip the digit
+     * panels themselves. Users on those launchers should resize the
+     * widget to 4×1 (closer to the BTClock aspect) for a fuller fit —
+     * see widget_description.
      */
     fun render(widthPx: Int, heightPx: Int, cells: List<PanelText>): Bitmap {
         require(cells.size == panelCount) {
@@ -148,12 +151,18 @@ class FrameRenderer(
         // rather than the widget cell's underlying surface.
         canvas.drawColor(palette.pcb)
 
-        val pxPerMm = w.toDouble() / FrameGeometry.FRAME_W_MM
+        val pxPerMm =
+            minOf(
+                w.toDouble() / FrameGeometry.FRAME_W_MM,
+                h.toDouble() / FrameGeometry.FRAME_H_MM,
+            )
+        val frameWPx = FrameGeometry.FRAME_W_MM * pxPerMm
         val frameHPx = FrameGeometry.FRAME_H_MM * pxPerMm
+        val ox = (w - frameWPx) / 2.0
         val oy = (h - frameHPx) / 2.0
 
         canvas.save()
-        canvas.translate(0f, oy.toFloat())
+        canvas.translate(ox.toFloat(), oy.toFloat())
 
         drawPanels(canvas, pxPerMm, cells)
         drawScrews(canvas, pxPerMm)
