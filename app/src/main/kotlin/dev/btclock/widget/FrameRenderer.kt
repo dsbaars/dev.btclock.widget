@@ -29,8 +29,7 @@ private fun fontIdByName(context: Context, name: String): Int =
  *   1. Black PCB soldermask
  *   2. Light-grey panel windows + gold ENIG silkscreen rings
  *   3. Inner panel content (digits / symbols / rotated split label)
- *   4. Four corner mounting-screw discs
- *   5. "BTClock" italic wordmark below the panel row
+ *   4. "BTClock" italic wordmark below the panel row
  *
  * The rotated split-label on panel 0 is the one new visual primitive
  * the dashboard's WASM doesn't expose to us as TS — implemented
@@ -79,12 +78,6 @@ class FrameRenderer(
             style = Paint.Style.STROKE
             strokeJoin = Paint.Join.ROUND
             strokeCap = Paint.Cap.ROUND
-        }
-
-    private val screwPaint =
-        Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = 0xFFDADBDE.toInt()
-            style = Paint.Style.FILL
         }
 
     private val wordmarkPaint =
@@ -165,7 +158,6 @@ class FrameRenderer(
         canvas.translate(ox.toFloat(), oy.toFloat())
 
         drawPanels(canvas, pxPerMm, cells)
-        drawScrews(canvas, pxPerMm)
         drawWordmark(canvas, pxPerMm)
 
         canvas.restore()
@@ -451,17 +443,6 @@ class FrameRenderer(
             if (width <= maxW && height <= maxH) lo = mid else hi = mid
         }
         return lo
-    }
-
-    private fun drawScrews(canvas: Canvas, pxPerMm: Double) {
-        val r = (FrameGeometry.SCREW_R_MM * pxPerMm).toFloat()
-        val inset = FrameGeometry.SCREW_INSET_MM * pxPerMm
-        val frameW = FrameGeometry.FRAME_W_MM * pxPerMm
-        val frameH = FrameGeometry.FRAME_H_MM * pxPerMm
-        canvas.drawCircle(inset.toFloat(), inset.toFloat(), r, screwPaint)
-        canvas.drawCircle((frameW - inset).toFloat(), inset.toFloat(), r, screwPaint)
-        canvas.drawCircle(inset.toFloat(), (frameH - inset).toFloat(), r, screwPaint)
-        canvas.drawCircle((frameW - inset).toFloat(), (frameH - inset).toFloat(), r, screwPaint)
     }
 
     private fun drawWordmark(canvas: Canvas, pxPerMm: Double) {

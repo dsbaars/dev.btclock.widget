@@ -22,9 +22,6 @@ object FrameGeometry {
 
     const val SIDE_MARGIN_MM = 5.0
 
-    const val SCREW_INSET_MM = 4.5
-    const val SCREW_R_MM = 0.95
-
     /** Black gap between the panel cutout edge and the gold ring. */
     const val RING_GAP_MM = 0.4
     const val RING_W_MM = 0.6
